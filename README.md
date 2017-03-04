@@ -12,7 +12,7 @@ In order to build tries, code block in the /src/main/java/example/TrieBuilder ca
         String OUTPUT_DIR = "output";
 
         //Vector file for word2vec
-        String VECTOR_FILE = "C:\\Users\\Murathan\\github\\vectors.txt";
+        String VECTOR_FILE = "vectors.txt";
 
         //Load the vector file
         WordVectors vectors = WordVectorSerializer.loadTxtVectors(new File(VECTOR_FILE));
@@ -46,7 +46,7 @@ In order to run learning process with created tries, code block in the /src/main
         String TRIE_DIR = "output";
 
         //Vector file for word2vec
-        String VECTOR_FILE = "C:\\Users\\Murathan\\github\\vectors.txt";
+        String VECTOR_FILE = "vectors.txt";
 
         //Word which the trie will be created accordingly
         int NUMBER_OF_ITERATION = 40;
