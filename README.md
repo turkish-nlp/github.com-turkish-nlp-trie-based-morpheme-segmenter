@@ -4,7 +4,7 @@ Java project for morpheme segmentation which is one of the most common NLP task 
 
 Implemented model combines informations which are obtained from tries (prefix trees) and "word2vec".
 
-In order to build tries, code block in the src/example/TrieBuilder can be used as follows:
+In order to build tries, code block in the /src/main/java/example/TrieBuilder can be used as follows:
 
         TrieBuilder tb = new TrieBuilder();
 
@@ -40,7 +40,7 @@ In order to build tries, code block in the src/example/TrieBuilder can be used a
         }
 
 
-In order to run learning process with created tries, code block in the src/example/Main can be used as follows:
+In order to run learning process with created tries, code block in the /src/main/java/example/Main can be used as follows:
 
         //Directory where tries will be put in serialized form
         String TRIE_DIR = "output";
