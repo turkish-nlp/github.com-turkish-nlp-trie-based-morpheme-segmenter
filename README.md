@@ -1,8 +1,8 @@
 # Trie-Based-Morpheme-Segmenter
 
-Java project for morpheme segmentation which is one of the most common NLP task esspecially in agglutinative language. 
+Java project for the morpheme segmentation which is one of the most common NLP tasks, especially for agglutinative languages.
 
-Implemented model combines informations which are obtained from tries (prefix trees) and "word2vec".
+Implemented model combines information obtained from two sources, namely tries (prefix trees) and "word2vec".
 
 In order to build tries, code block in the /src/main/java/example/TrieBuilder can be used as follows:
 
