@@ -1,4 +1,4 @@
-/* BUILDING FILTERED BACKWARD TRIES  */
+/* BUILDING UNFILTERED BACKWARD TRIES  */
 package example3;
 
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
