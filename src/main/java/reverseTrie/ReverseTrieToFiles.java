@@ -11,30 +11,23 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Mete Han Kahraman
+ * Edited by Ahmet on 14-May-17.
  */
 public class ReverseTrieToFiles {
 
     private List<ReverseTrie> trieList = new ArrayList<>();
     private List<String> searchedWordList = new ArrayList<>();
     private HashSet<String> similarityKeys = new HashSet<>();
-    private static WordVectors vectors;
 
-    public ConcurrentHashMap<String, Double> concurrentSimilarityScores = new ConcurrentHashMap<>();
-
-
-    public HashMap<String, Double> similarityScoresToSerialize = new HashMap<>();
     public HashMap<String, HashMap<String, Integer>> branchFactors = new HashMap<>();
     public HashMap<String, TreeSet<String>> trieWords = new HashMap<>();
 
-    public ReverseTrieToFiles(String vectorDir) throws IOException, ClassNotFoundException {
-        this.vectors = WordVectorSerializer.loadTxtVectors(new File(vectorDir));
+    public ReverseTrieToFiles() throws IOException, ClassNotFoundException {
     }
 
     public void run(String dir, String outputDir) throws IOException, ClassNotFoundException {
         generateTrieList(dir);
-        serialize(outputDir, similarityScoresToSerialize, "similarityScoresToSerialize");
-        serialize(outputDir, trieWords, "trieWords");
-        serialize(outputDir, branchFactors, "branchFactors");
+        serialize(outputDir, branchFactors, "backward-branchFactors");
     }
 
 /*    public static void main(String[] args) throws IOException, ClassNotFoundException {
@@ -60,74 +53,7 @@ public class ReverseTrieToFiles {
         }
 
         fillBranchFactorMap();
-        fillSimilarityMap();
         System.out.println();
-    }
-
-    private void fillSimilarityMap() {
-
-        ArrayList<Set<String>> setsForParallel = new ArrayList<>();
-        int count = 0;
-        HashSet<String> tmp = new HashSet<>();
-        for (String w : similarityKeys) {
-            if (count < 2000) {
-                tmp.add(w);
-                count++;
-            }
-            if (count == 2000) {
-                count = 0;
-                setsForParallel.add(tmp);
-                tmp = new HashSet<>();
-            }
-        }
-        setsForParallel.add(tmp);
-
-        ConcurrentHashSet<String> tokens = new ConcurrentHashSet<>();
-
-        for (Set<String> similarityKeys : setsForParallel) {
-            similarityKeys.parallelStream().forEach((word) -> {
-                for (int i = word.length(); i > 1; i--) {
-                    tokens.add(word.substring(0, i));
-                }
-            });
-        }
-
-        setsForParallel = new ArrayList<>();
-        count = 0;
-        tmp = new HashSet<>();
-        for (String w : tokens) {
-            if (count < 2000) {
-                tmp.add(w);
-                count++;
-            }
-            if (count == 2000) {
-                count = 0;
-                setsForParallel.add(tmp);
-                tmp = new HashSet<>();
-            }
-        }
-        setsForParallel.add(tmp);
-
-        for (Set<String> similarityKeys : setsForParallel) {
-            similarityKeys.parallelStream().forEach((word) -> {
-                for (int i = 1; i < word.length(); i++) {
-                    String key = word.substring(0, i);
-                    String keyCopy = word.substring(0, i);
-                    keyCopy = keyCopy + "+" + word.substring(i);
-                    double cosine = vectors.similarity(key, word);
-                    if (!vectors.hasWord(key) || !vectors.hasWord(word) || cosine < 0 || cosine > 1) {
-                        cosine = -1;
-                    }
-                    concurrentSimilarityScores.put(keyCopy, cosine);
-                }
-            });
-        }
-
-        for (String str : concurrentSimilarityScores.keySet()) {
-            similarityScoresToSerialize.put(str, concurrentSimilarityScores.get(str));
-        }
-
-
     }
 
     private void fillBranchFactorMap() {

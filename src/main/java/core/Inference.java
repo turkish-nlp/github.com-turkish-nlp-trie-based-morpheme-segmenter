@@ -10,6 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by Murathan on 29-Sep-16.
+ * Edited by Ahmet on 14-May-17.
  */
 public class Inference {
 
@@ -21,19 +22,21 @@ public class Inference {
     private int sizeOfTable = 0;
     private double alpha;
     private double gamma;
-    private static boolean[] featuresBooleanList = new boolean[4]; //0:poisson, 1:similarity, 2:presence, 3: length
+    private static boolean[] featuresBooleanList = new boolean[5]; //0:poisson-forward, 1:poisson-backward, 1:similarity, 2:presence, 3: length
     private String featString = "";
     private int heuristic;
 
 
     public String generateFeatureString() {
         if (featuresBooleanList[0] == true)
-            featString = featString + "_Pois";
+            featString = featString + "_PoisF";
         if (featuresBooleanList[1] == true)
-            featString = featString + "_Sim";
+            featString = featString + "_PoisB";
         if (featuresBooleanList[2] == true)
-            featString = featString + "_Pres";
+            featString = featString + "_Sim";
         if (featuresBooleanList[3] == true)
+            featString = featString + "_Pres";
+        if (featuresBooleanList[4] == true)
             featString = featString + "_Len";
 
         return featString;
@@ -51,9 +54,9 @@ public class Inference {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-        Inference i = new Inference(args[0], args[1], Double.parseDouble(args[2]), Integer.parseInt(args[3]), Double.parseDouble(args[4]),
-                Double.parseDouble(args[5]), Boolean.valueOf(args[6]), Boolean.valueOf(args[7]), Boolean.valueOf(args[8]), Boolean.valueOf(args[9]),
-                Integer.parseInt(args[10]), Double.parseDouble(args[11]), Double.parseDouble(args[12]));
+        Inference i = new Inference(args[0], args[1], Double.parseDouble(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]), Double.parseDouble(args[5]),
+                Double.parseDouble(args[6]), Boolean.valueOf(args[7]), Boolean.valueOf(args[8]), Boolean.valueOf(args[9]), Boolean.valueOf(args[10]), Boolean.valueOf(args[11]),
+                Integer.parseInt(args[12]), Double.parseDouble(args[13]), Double.parseDouble(args[14]));
 
         i.featString = i.generateFeatureString();
 
@@ -72,11 +75,11 @@ public class Inference {
         }
     }
 
-    public Inference(String outputDir, String wordListDir, double lambda,
-                     int noOfIteration, double alpha, double gamma, boolean poisson,
+    public Inference(String outputDir, String wordListDir, double lambda_f, double lambda_b,
+                     int noOfIteration, double alpha, double gamma, boolean poisson_f, boolean poisson_b,
                      boolean sim, boolean presence, boolean length, int heuristic, double simUnsegmentedArg, double simUnfoundArg) throws IOException, ClassNotFoundException {
 
-        Initialization baseline = new Initialization(outputDir, wordListDir, lambda, heuristic, simUnsegmentedArg, simUnfoundArg);
+        Initialization baseline = new Initialization(outputDir, wordListDir, lambda_f, lambda_b, heuristic, simUnsegmentedArg, simUnfoundArg);
 
         this.heuristic = heuristic;
 
@@ -89,10 +92,11 @@ public class Inference {
         for (String str : frequencyTable.keySet()) {
             sizeOfTable = sizeOfTable + frequencyTable.get(str);
         }
-        featuresBooleanList[0] = poisson;
-        featuresBooleanList[1] = sim;
-        featuresBooleanList[2] = presence;
-        featuresBooleanList[3] = length;
+        featuresBooleanList[0] = poisson_f;
+        featuresBooleanList[1] = poisson_b;
+        featuresBooleanList[2] = sim;
+        featuresBooleanList[3] = presence;
+        featuresBooleanList[4] = length;
     }
 
     public void doSampling() throws IOException {
@@ -123,9 +127,9 @@ public class Inference {
         double forNormalize = 0.0;
         double dpScore = 0.0;
         for (String split : possibleSplits) {
-            ArrayList<Double> priors = sample.calculateScores(split, featuresBooleanList);  // //0:poisson, 1:similarity, 2:presence, 3: length
+            ArrayList<Double> priors = sample.calculateScores(split, featuresBooleanList);  // //0:poisson_f, 1:poisson_b, 2:similarity, 3:presence, 4: length
             dpScore = calculateLikelihoodsWithDP(split);
-            double total = dpScore + priors.get(0) + priors.get(1) + priors.get(2) + priors.get(3);
+            double total = dpScore + priors.get(0) + priors.get(1) + priors.get(2) + priors.get(3) + priors.get(4);
 
             //       System.out.printf("%s%13f%13f%13f%13f%13f", split, dpScore, priors.get(0), priors.get(1), priors.get(2), priors.get(3));
             //      System.out.println();

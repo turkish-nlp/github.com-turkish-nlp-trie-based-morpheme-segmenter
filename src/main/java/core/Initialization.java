@@ -14,7 +14,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Initialization {
 
 
-    private static double lambda;
+    private static double lambda_f;
+    private static double lambda_b;
     private static HashMap<String, Double> newCorpus = new HashMap<>();
     private static double newCorpusSize = 0;
     private static double laplaceCoefficient = 0.0000001;
@@ -24,7 +25,8 @@ public class Initialization {
     private static double smoothingCoefficient = 0.01;
 
     private static HashMap<String, Double> cosineTable;
-    private static HashMap<String, HashMap<String, Integer>> branchTable;
+    private static HashMap<String, HashMap<String, Integer>> branchTable_f;
+    private static HashMap<String, HashMap<String, Integer>> branchTable_b;
     private static HashMap<String, TreeSet<String>> trieTable;
 
     private Map<String, Set<String>> baselineBoundaries = new ConcurrentHashMap<>();
@@ -66,8 +68,12 @@ public class Initialization {
         return morphemeFreq;
     }
 
-    public static double getLambda() {
-        return lambda;
+    public static double getLambda_f() {
+        return lambda_f;
+    }
+
+    public static double getLambda_b() {
+        return lambda_b;
     }
 
     public static HashMap<String, Double> getNewCorpus() {
@@ -82,17 +88,22 @@ public class Initialization {
         return trieTable;
     }
 
-    public static HashMap<String, HashMap<String, Integer>> getBranchTable() {
-        return branchTable;
+    public static HashMap<String, HashMap<String, Integer>> getBranchTable_f() {
+        return branchTable_f;
+    }
+
+    public static HashMap<String, HashMap<String, Integer>> getBranchTable_b() {
+        return branchTable_b;
     }
 
     public static HashMap<String, Double> getCosineTable() {
         return cosineTable;
     }
 
-    public Initialization(String mapDir, String wordListDir, double lambda, int heuristic, double simUnsegmentedArg, double simUnfound) throws IOException, ClassNotFoundException {
+    public Initialization(String mapDir, String wordListDir, double lambda_f, double lambda_b, int heuristic, double simUnsegmentedArg, double simUnfound) throws IOException, ClassNotFoundException {
 
-        this.lambda = lambda;
+        this.lambda_f = lambda_f;
+        this.lambda_b = lambda_b;
         this.heuristic = heuristic;
         this.simUnsegmented = simUnsegmentedArg;
         this.simUnfound = simUnfound;
@@ -105,7 +116,7 @@ public class Initialization {
             System.out.println(e.getMessage());
             freqWords = Files.readAllLines(new File(wordListDir).toPath(), Charset.forName("ISO-8859-9"));
         }
-        generateTrieList(mapDir + "//similarityScoresToSerialize", mapDir + "//branchFactors", mapDir + "//trieWords");
+        generateTrieList(mapDir + "//similarityScoresToSerialize", mapDir + "//forward-branchFactors", mapDir + "//backward-branchFactors", mapDir + "//trieWords");
 
         trieTable.keySet().parallelStream().forEach((n) -> {
             this.calculateFrequencyForMorp(n);
@@ -126,10 +137,11 @@ public class Initialization {
         //corpus.clear();
     }
 
-    public void generateTrieList(String nameOfsimilarityScoresFile, String nameOfBranchFactors, String nameOfTrieWords) throws IOException, ClassNotFoundException {
+    public void generateTrieList(String nameOfsimilarityScoresFile, String nameOfBranchFactors_f, String nameOfBranchFactors_b, String nameOfTrieWords) throws IOException, ClassNotFoundException {
 
         File filesOfsimilarityScoresFile = new File(nameOfsimilarityScoresFile);
-        File filesOfBranchFactors = new File(nameOfBranchFactors);
+        File filesOfBranchFactors_f = new File(nameOfBranchFactors_f);
+        File filesOfBranchFactors_b = new File(nameOfBranchFactors_b);
         File filesOfTrieWords = new File(nameOfTrieWords);
 
         FileInputStream fis = new FileInputStream(filesOfsimilarityScoresFile);
@@ -142,7 +154,7 @@ public class Initialization {
 
         cosineTable = (HashMap<String, Double>) o;
 
-        fis = new FileInputStream(filesOfBranchFactors);
+        fis = new FileInputStream(filesOfBranchFactors_f);
         in = null;
         o = null;
         in = new ObjectInputStream(fis);
@@ -150,7 +162,17 @@ public class Initialization {
         fis.close();
         in.close();
 
-        branchTable = (HashMap<String, HashMap<String, Integer>>) o;
+        branchTable_f = (HashMap<String, HashMap<String, Integer>>) o;
+
+        fis = new FileInputStream(filesOfBranchFactors_b);
+        in = null;
+        o = null;
+        in = new ObjectInputStream(fis);
+        o = in.readObject();
+        fis.close();
+        in.close();
+
+        branchTable_b = (HashMap<String, HashMap<String, Integer>>) o;
 
         fis = new FileInputStream(filesOfTrieWords);
         in = null;
@@ -167,11 +189,11 @@ public class Initialization {
 
     public void generateBoundaryListforBaseline(int childLimit) {
 
-        for (String trie : branchTable.keySet()) {
+        for (String trie : branchTable_f.keySet()) {
             Set<String> boundaryList = new TreeSet<>();
             // for baseline
-            for (String s : branchTable.get(trie).keySet()) {
-                if (branchTable.get(trie).get(s) >= childLimit) {
+            for (String s : branchTable_f.get(trie).keySet()) {
+                if (branchTable_f.get(trie).get(s) >= childLimit) {
                     boundaryList.add(s);
                 }
             }

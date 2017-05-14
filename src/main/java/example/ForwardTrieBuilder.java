@@ -6,19 +6,15 @@ import trie.TrieOperations;
 import trie.TrieST;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created by Murathan on 04-Mar-17.
  */
-public class TrieBuilder {
+public class ForwardTrieBuilder {
 
     private TrieST buildTrie(Collection<String> wordList) {
         TrieST st = new TrieST();
@@ -31,23 +27,23 @@ public class TrieBuilder {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-        TrieBuilder tb = new TrieBuilder();
+        ForwardTrieBuilder tb = new ForwardTrieBuilder();
 
         //Directory where tries will be put in serialized form
-        String OUTPUT_DIR = "output";
+        String OUTPUT_DIR = "forward-tries";
 
         //Vector file for word2vec
-        String VECTOR_FILE = "C:\\Users\\Murathan\\github\\vectors.txt";
+        String VECTOR_FILE = "/Users/ahmet/Desktop/MorphologySoftware/word2vec/turkce";
 
         //Load the vector file
         WordVectors vectors = WordVectorSerializer.loadTxtVectors(new File(VECTOR_FILE));
         System.out.println("========= Vector file is loaded =========");
 
         //Word which the trie will be created accordingly
-        String INPUT_WORD = "lise";
+        String INPUT_WORD = "geldiler";
 
         //Get the closest 20 word to INPUT_WORD
-        Collection<String> word2vecNeighbours = vectors.wordsNearest(INPUT_WORD, 20);
+        Collection<String> word2vecNeighbours = vectors.wordsNearest(INPUT_WORD, 10);
         TrieST trie = tb.buildTrie(word2vecNeighbours);
         System.out.println("========= Trie is built =========");
 

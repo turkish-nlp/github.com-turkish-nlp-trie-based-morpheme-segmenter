@@ -1,24 +1,24 @@
 /* BUILDING UNFILTERED BACKWARD TRIES  */
-package example3;
+package example;
 
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
-import reverseTrie.ReverseTrieOperations;
 import reverseTrie.ReverseTrie;
+import reverseTrie.ReverseTrieOperations;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.io.BufferedReader;
-import java.io.FileReader;
 
 /**
  * Created by Murathan on 04-Mar-17.
  * Editted by Diyala Erekat on 9-May-17
  */
-public class TrieBuilder {
+public class BackwardTrieBuilder {
 
     private ReverseTrie buildTrie(Collection<String> wordList) {
     	ReverseTrie st = new ReverseTrie();
@@ -36,7 +36,7 @@ public class TrieBuilder {
         String INPUT_WORD_FILENAME = args[2]; //Word which the trie will be created accordingly
         int numOfNearestWords =  Integer.parseInt(args[3]);
         
-        TrieBuilder tb = new TrieBuilder();
+        BackwardTrieBuilder tb = new BackwardTrieBuilder();
         //Load the vector file
         WordVectors vectors = WordVectorSerializer.loadTxtVectors(new File(VECTOR_FILE));
         System.out.println("========= Vector file is loaded =========");

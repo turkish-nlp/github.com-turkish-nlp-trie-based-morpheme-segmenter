@@ -34,7 +34,7 @@ public class TrieToFiles {
         generateTrieList(dir);
         serialize(outputDir, similarityScoresToSerialize, "similarityScoresToSerialize");
         serialize(outputDir, trieWords, "trieWords");
-        serialize(outputDir, branchFactors, "branchFactors");
+        serialize(outputDir, branchFactors, "forward-branchFactors");
     }
 
 /*    public static void main(String[] args) throws IOException, ClassNotFoundException {

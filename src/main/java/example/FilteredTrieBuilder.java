@@ -1,24 +1,24 @@
 /* BUILDING FILTERED FORWARD TRIES  */
-package example2;
+package example;
 
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import trie.TrieOperations;
 import trie.TrieST;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.io.BufferedReader;
-import java.io.FileReader;
 
 /**
  * Created by Murathan on 04-Mar-17.
  * Editted by Diyala Erekat on 10-May-17
  */
-public class TrieBuilder {
+public class FilteredTrieBuilder {
 
 	/* Compare the similarity between two words and filter out the dissimilar ones
 	*  This is done through two steps:
@@ -105,7 +105,7 @@ public class TrieBuilder {
         int numOfNearestWords =  Integer.parseInt(args[3]); //number of nearest neighbor words from word2vec
         int thresh =  Integer.parseInt(args[4]); //theshold for minimum edit distance
         
-        TrieBuilder tb = new TrieBuilder();
+        FilteredTrieBuilder tb = new FilteredTrieBuilder();
 
         //Load the vector file
         WordVectors vectors = WordVectorSerializer.loadTxtVectors(new File(VECTOR_FILE));

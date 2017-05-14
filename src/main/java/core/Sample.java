@@ -106,20 +106,28 @@ public class Sample {
     public ArrayList<Double> calculateScores(String segmentation, boolean[] features) {
         //0:poisson, 1:similarity, 2:presence
         ArrayList<Double> scores = new ArrayList<>();
-        boolean poisson = features[0];
-        boolean sim = features[1];
-        boolean presence = features[2];
-        boolean length = features[3];
+        boolean poisson_f = features[0];
+        boolean poisson_b = features[1];
+        boolean sim = features[2];
+        boolean presence = features[3];
+        boolean length = features[4];
 
         ArrayList<String> segments = Operations.getSegments(segmentation);
         ArrayList<String> segmentsForRecursive = new ArrayList<>(segments);
 
-        if (segmentsForRecursive.size() > 1)
+        boolean wordItself = true;
+        if (segmentsForRecursive.size() > 1) {
             segmentsForRecursive.remove(segmentsForRecursive.size() - 1);
+            wordItself = false;
+        }
 
-        double poissonScore = 0;
-        if (poisson)
-            poissonScore = calculatePoisson(segmentsForRecursive);
+        double poissonScore_f = 0;
+        if (poisson_f)
+            poissonScore_f = calculatePoisson_f(segmentsForRecursive);
+
+        double poissonScore_b = 0;
+        if (poisson_b)
+            poissonScore_b = calculatePoisson_b(segments, wordItself);
 
         double similarityScore = 0;
         if (sim)
@@ -133,7 +141,8 @@ public class Sample {
         if (length)
             lengthScore = calculateLenghtScore(segmentation);
 
-        scores.add(poissonScore);
+        scores.add(poissonScore_f);
+        scores.add(poissonScore_b);
         scores.add(similarityScore);
         scores.add(presenceScore);
         scores.add(lengthScore);
@@ -155,10 +164,21 @@ public class Sample {
 
     }
 
-    private double calculatePoisson(ArrayList<String> segments) {
+    private double calculatePoisson_f(ArrayList<String> segments) {
         double totalPoisson = 0;
         for (String s : segments) {
-            totalPoisson = totalPoisson + Math.log10(Operations.getPoissonScore(Initialization.getBranchTable().get(inTrie).get(s), Initialization.getLambda()));
+            totalPoisson = totalPoisson + Math.log10(Operations.getPoissonScore(Initialization.getBranchTable_f().get(inTrie).get(s), Initialization.getLambda_f()));
+        }
+        return totalPoisson;
+    }
+
+    private double calculatePoisson_b(ArrayList<String> segments, boolean wordItself) {
+        double totalPoisson = 0;
+        if  (!wordItself) {
+            String reverseSuff = new StringBuilder(segments.get(1).substring(segments.get(0).length())).reverse().toString();
+            totalPoisson = totalPoisson + Math.log10(Operations.getPoissonScore(Initialization.getBranchTable_b().get(inTrie).get(reverseSuff), Initialization.getLambda_b()));
+        } else {
+            totalPoisson = totalPoisson + Math.log10(Operations.getPoissonScore(1, Initialization.getLambda_b()));
         }
         return totalPoisson;
     }
