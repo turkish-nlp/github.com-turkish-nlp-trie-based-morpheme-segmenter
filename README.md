@@ -6,38 +6,43 @@ Implemented model combines information obtained from three sources, namely forwa
 
 In order to build forward-tries, code block in the /src/main/java/example/TrieBuilder can be used as follows:
 
-        TrieBuilder tb = new TrieBuilder();
+        ForwardTrieBuilder tb = new ForwardTrieBuilder();
 
         //Directory where tries will be put in serialized form
         String OUTPUT_DIR = "forward-tries";
 
         //Vector file for word2vec
-        String VECTOR_FILE = "vectors.txt";
+        String VECTOR_FILE = "vector.txt";
 
         //Load the vector file
         WordVectors vectors = WordVectorSerializer.loadTxtVectors(new File(VECTOR_FILE));
         System.out.println("========= Vector file is loaded =========");
 
         //Word which the trie will be created accordingly
-        String INPUT_WORD = "lise";
+        String INPUT_WORD_FILENAME = "corpus/test.txt";
 
-        //Get the closest 20 word to INPUT_WORD
-        Collection<String> word2vecNeighbours = vectors.wordsNearest(INPUT_WORD, 20);
-        TrieST trie = tb.buildTrie(word2vecNeighbours);
-        System.out.println("========= Trie is built =========");
+        String INPUT_WORD;
+        BufferedReader reader = new BufferedReader(new FileReader(INPUT_WORD_FILENAME));
+        while((INPUT_WORD = reader.readLine()) != null){
+            //Get the closest X word to INPUT_WORD
+            Collection<String> word2vecNeighbours = vectors.wordsNearest(INPUT_WORD, 20);
+            TrieST trie = tb.buildTrie(word2vecNeighbours);
+            TrieOperations.serializeToFile(trie, INPUT_WORD, OUTPUT_DIR);
+        }
 
-        TrieOperations.serializeToFile(trie, INPUT_WORD, OUTPUT_DIR);
+        System.out.println("========= Tries is built =========");
 
         //Use tries by deserializing them (below it prints the words which start with the INPUT_WORD)
         ArrayList<TrieST> tries = TrieOperations.deSerialize(OUTPUT_DIR);
         for (TrieST t : tries) {
-            Iterator ite = t.keysWithPrefix(INPUT_WORD).iterator();
+            Iterator ite = t.keysWithPrefix("").iterator();
 
             while (ite.hasNext()) {
                 String next = (String) ite.next();
                 System.out.println(next);
             }
         }
+    }
 
 In order to build backward-tries, code block in the /src/main/java/example/BackwardTrieBuilder can be used as follows:
 
@@ -55,19 +60,25 @@ In order to build backward-tries, code block in the /src/main/java/example/Backw
         System.out.println("========= Vector file is loaded =========");
 
         //Word which the trie will be created accordingly
-        String INPUT_WORD = "lise";
+        String INPUT_WORD_FILENAME = "corpus/test.txt";
 
-        //Get the closest 20 word to INPUT_WORD
-        Collection<String> word2vecNeighbours = vectors.wordsNearest(INPUT_WORD, 20);
-        ReverseTrie trie = tb.buildTrie(word2vecNeighbours);
-        System.out.println("========= Trie is built =========");
+        String INPUT_WORD;
+        BufferedReader reader = new BufferedReader(new FileReader(INPUT_WORD_FILENAME));
+        while((INPUT_WORD = reader.readLine()) != null){
+            //Get the closest X word to INPUT_WORD
+            Collection<String> word2vecNeighbours = vectors.wordsNearest(INPUT_WORD, 20);
+            ReverseTrie trie = tb.buildTrie(word2vecNeighbours);
+            ReverseTrieOperations.serializeToFile(trie, INPUT_WORD, OUTPUT_DIR);
+        }
+
+        System.out.println("========= Tries is built =========");
 
         ReverseTrieOperations.serializeToFile(trie, INPUT_WORD, OUTPUT_DIR);
 
         //Use tries by deserializing them (below it prints the words which start with the INPUT_WORD)
         ArrayList<ReverseTrie> tries = ReverseTrieOperations.deSerialize(OUTPUT_DIR);
         for (ReverseTrie t : tries) {
-            Iterator ite = t.keysWithPrefix(INPUT_WORD).iterator();
+            Iterator ite = t.keysWithPostfix(INPUT_WORD).iterator();
 
             while (ite.hasNext()) {
                 String next = (String) ite.next();

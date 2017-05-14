@@ -162,7 +162,6 @@ public class Inference {
         //   System.out.println("s_value: " + s_value);
         String selected = possibleSplits.get(scores.indexOf(s_value));
 
-
         if (!selected.equals(word)) {
 
             StringTokenizer tokenizer = new StringTokenizer(selected, "+");

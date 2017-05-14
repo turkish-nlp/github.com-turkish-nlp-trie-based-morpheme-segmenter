@@ -2,10 +2,14 @@ package example;
 
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
+import reverseTrie.ReverseTrie;
+import reverseTrie.ReverseTrieOperations;
 import trie.TrieOperations;
 import trie.TrieST;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,19 +44,23 @@ public class ForwardTrieBuilder {
         System.out.println("========= Vector file is loaded =========");
 
         //Word which the trie will be created accordingly
-        String INPUT_WORD = "geldiler";
+        String INPUT_WORD_FILENAME = "corpus/test.txt";
 
-        //Get the closest 20 word to INPUT_WORD
-        Collection<String> word2vecNeighbours = vectors.wordsNearest(INPUT_WORD, 10);
-        TrieST trie = tb.buildTrie(word2vecNeighbours);
-        System.out.println("========= Trie is built =========");
+        String INPUT_WORD;
+        BufferedReader reader = new BufferedReader(new FileReader(INPUT_WORD_FILENAME));
+        while((INPUT_WORD = reader.readLine()) != null){
+            //Get the closest X word to INPUT_WORD
+            Collection<String> word2vecNeighbours = vectors.wordsNearest(INPUT_WORD, 20);
+            TrieST trie = tb.buildTrie(word2vecNeighbours);
+            TrieOperations.serializeToFile(trie, INPUT_WORD, OUTPUT_DIR);
+        }
 
-        TrieOperations.serializeToFile(trie, INPUT_WORD, OUTPUT_DIR);
+        System.out.println("========= Tries is built =========");
 
         //Use tries by deserializing them (below it prints the words which start with the INPUT_WORD)
         ArrayList<TrieST> tries = TrieOperations.deSerialize(OUTPUT_DIR);
         for (TrieST t : tries) {
-            Iterator ite = t.keysWithPrefix(INPUT_WORD).iterator();
+            Iterator ite = t.keysWithPrefix("").iterator();
 
             while (ite.hasNext()) {
                 String next = (String) ite.next();

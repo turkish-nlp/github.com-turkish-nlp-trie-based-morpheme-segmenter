@@ -40,6 +40,7 @@ public class BackwardTrieBuilder {
         //Load the vector file
         WordVectors vectors = WordVectorSerializer.loadTxtVectors(new File(VECTOR_FILE));
         System.out.println("========= Vector file is loaded =========");
+
         String INPUT_WORD;
         BufferedReader reader = new BufferedReader(new FileReader(INPUT_WORD_FILENAME));
         while((INPUT_WORD = reader.readLine()) != null){

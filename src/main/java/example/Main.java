@@ -23,7 +23,7 @@ public class Main {
 
         Inference inference = new Inference("maps","corpus/wordlist-2010.tur.txt", 4, 4, noOfIteration, 0.000001, 0.037 ,true , true, true, true, false,3,1, 0.1 );
         inference.run();
-        System.out.println("========= Learning is finished. RESULTS: =========");
+        System.out.println("========= Learning is finished. =========");
 
     }
 

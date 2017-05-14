@@ -115,10 +115,8 @@ public class Sample {
         ArrayList<String> segments = Operations.getSegments(segmentation);
         ArrayList<String> segmentsForRecursive = new ArrayList<>(segments);
 
-        boolean wordItself = true;
         if (segmentsForRecursive.size() > 1) {
             segmentsForRecursive.remove(segmentsForRecursive.size() - 1);
-            wordItself = false;
         }
 
         double poissonScore_f = 0;
@@ -127,7 +125,7 @@ public class Sample {
 
         double poissonScore_b = 0;
         if (poisson_b)
-            poissonScore_b = calculatePoisson_b(segments, wordItself);
+            poissonScore_b = calculatePoisson_b(segmentsForRecursive);
 
         double similarityScore = 0;
         if (sim)
@@ -172,14 +170,18 @@ public class Sample {
         return totalPoisson;
     }
 
-    private double calculatePoisson_b(ArrayList<String> segments, boolean wordItself) {
+    private double calculatePoisson_b(ArrayList<String> segments) {
         double totalPoisson = 0;
-        if  (!wordItself) {
-            String reverseSuff = new StringBuilder(segments.get(1).substring(segments.get(0).length())).reverse().toString();
-            totalPoisson = totalPoisson + Math.log10(Operations.getPoissonScore(Initialization.getBranchTable_b().get(inTrie).get(reverseSuff), Initialization.getLambda_b()));
-        } else {
-            totalPoisson = totalPoisson + Math.log10(Operations.getPoissonScore(1, Initialization.getLambda_b()));
+
+        for (String s : segments) {
+            String suffix = new StringBuilder(this.getWord().substring(segments.get(0).length())).reverse().toString();
+            if (!suffix.equalsIgnoreCase("")) {
+                totalPoisson = totalPoisson + Math.log10(Operations.getPoissonScore(Initialization.getBranchTable_b().get(inTrie).get(suffix), Initialization.getLambda_b()));
+            } else {
+                totalPoisson = totalPoisson + Math.log10(Operations.getPoissonScore(1, Initialization.getLambda_b()));
+            }
         }
+
         return totalPoisson;
     }
 
