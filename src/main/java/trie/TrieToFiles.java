@@ -30,11 +30,16 @@ public class TrieToFiles {
         this.vectors = WordVectorSerializer.loadTxtVectors(new File(vectorDir));
     }
 
-    public void run(String dir, String outputDir) throws IOException, ClassNotFoundException {
+    public void run(String dir, String outputDir, boolean back) throws IOException, ClassNotFoundException {
         generateTrieList(dir);
+        if(!back){
         serialize(outputDir, similarityScoresToSerialize, "similarityScoresToSerialize");
         serialize(outputDir, trieWords, "trieWords");
-        serialize(outputDir, branchFactors, "forward-branchFactors");
+
+            serialize(outputDir, branchFactors, "forward-branchFactors");}
+        else
+            serialize(outputDir, branchFactors, "backward-branchFactors");
+
     }
 
 /*    public static void main(String[] args) throws IOException, ClassNotFoundException {

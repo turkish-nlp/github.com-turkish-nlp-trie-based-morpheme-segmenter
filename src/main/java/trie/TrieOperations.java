@@ -33,6 +33,8 @@ public class TrieOperations {
         File[] files = new File(dir + File.separator).listFiles();
 
         for (File f : files) {
+            if(f.getName().contains("DS_"))
+                continue;
 
             FileInputStream fis = new FileInputStream(f);
             ObjectInput in = null;

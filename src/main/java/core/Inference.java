@@ -322,7 +322,7 @@ public class Inference {
         bos.close();
         out.close();
 
-        FileUtils.writeByteArrayToFile(new File("finalMODEL-NOI_" + noOfIterationCopy + "-A_" + alpha + "-G_" + gamma + "-Feat" + featString + "-heuristic_" + heuristic + "-SimUNS_" + Initialization.getSimUnsegmented() ), yourBytes);
+        FileUtils.writeByteArrayToFile(new File("filtered_tries_model" ), yourBytes);
     }
 
 }

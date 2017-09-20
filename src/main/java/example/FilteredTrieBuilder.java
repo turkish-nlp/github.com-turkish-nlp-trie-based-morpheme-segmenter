@@ -29,7 +29,7 @@ public class FilteredTrieBuilder {
 	* 	True; add it to the list
 	*   False; filter out
 	* */
-	 private Collection<String> filterOutNonSimilar(String queryWord, Collection<String> nearestWords, int thresh){
+	public Collection<String> filterOutNonSimilar(String queryWord, Collection<String> nearestWords, int thresh){
         Collection<String> filteredOut = new ArrayList<>();
         int minEditDistance;
 		int firstThree = 3;
@@ -52,7 +52,7 @@ public class FilteredTrieBuilder {
 		which calculates the minimum edit distance value
 		https://en.wikipedia.org/wiki/Levenshtein_distance
 	*/
-	private int minDistance(String word1, String word2) {
+	public int minDistance(String word1, String word2) {
 		int distance = 0;
 		int cost, insertion, deletion, substitution;
 		int len1 = word1.length();
@@ -76,14 +76,14 @@ public class FilteredTrieBuilder {
 
 		return distance;
 	}
-    
-    private int getMinimum(int insertion, int deletion, int substitutions){
+
+	public int getMinimum(int insertion, int deletion, int substitutions){
         return (insertion > deletion ) ? 
                ((deletion > substitutions) ? substitutions : deletion) : 
                ((insertion > substitutions) ? substitutions : insertion);
     }
     
-    private TrieST buildTrie(Collection<String> wordList) {
+    public TrieST buildTrie(Collection<String> wordList) {
     	TrieST st = new TrieST();
 
         for (String str : wordList) {
@@ -98,34 +98,48 @@ public class FilteredTrieBuilder {
 	*/
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-        
         String VECTOR_FILE = args[0]; //Vector file for word2vec
         String OUTPUT_DIR =  args[1]; //Directory where tries will be put in serialized form
-        String INPUT_WORD_FILENAME = args[2]; //Word which the trie will be created accordingly
-        int numOfNearestWords =  Integer.parseInt(args[3]); //number of nearest neighbor words from word2vec
-        int thresh =  Integer.parseInt(args[4]); //theshold for minimum edit distance
+		String OUTPUT_DIR_BACK =  args[2]; //Directory where BACKWARD tries will be put in serialized form
+
+		String INPUT_WORD_FILENAME = args[3]; //Word which the trie will be created accordingly
+        int numOfNearestWords =  Integer.parseInt(args[4]); //number of nearest neighbor words from word2vec
+        int thresh =  Integer.parseInt(args[5]); //theshold for minimum edit distance
         
         FilteredTrieBuilder tb = new FilteredTrieBuilder();
 
         //Load the vector file
         WordVectors vectors = WordVectorSerializer.loadTxtVectors(new File(VECTOR_FILE));
-        System.out.println("========= Vector file is loaded =========");
+        System.out.println("=========Vector file is loaded=========");
         
-        String INPUT_WORD;
+        String line;
+		int c = 0;
         BufferedReader reader = new BufferedReader(new FileReader(INPUT_WORD_FILENAME));
-        while((INPUT_WORD = reader.readLine()) != null){
-	        //Get the closest X word to INPUT_WORD
-	        Collection<String> word2vecNeighbours = vectors.wordsNearest(INPUT_WORD, numOfNearestWords);
-			//Filter out the noisy words
-	        Collection<String> filteredWord2vecNeighbours = tb.filterOutNonSimilar(INPUT_WORD, word2vecNeighbours, thresh);
-			// Build the tries with the filtered words
-	        TrieST trie = tb.buildTrie(filteredWord2vecNeighbours);
-	        TrieOperations.serializeToFile(trie, INPUT_WORD, OUTPUT_DIR);
-        }
+       while((line = reader.readLine()) != null) {
+           //Get the closest X word to INPUT_WORD
+           String INPUT_WORD = line.split(" ")[1];
+           if (vectors.hasWord(INPUT_WORD)) {
+               System.out.println(++c);
+               Collection<String> word2vecNeighbours = vectors.wordsNearest(INPUT_WORD, numOfNearestWords);
+               //Filter out the noisy words
+               Collection<String> filteredWord2vecNeighbours = tb.filterOutNonSimilar(INPUT_WORD, word2vecNeighbours, thresh);
 
+               Collection<String> reverseWord2vecNeighbours = new ArrayList<>();
+
+               for (String str : filteredWord2vecNeighbours) {
+                   reverseWord2vecNeighbours.add(new StringBuilder(str).reverse().toString());
+               }
+               // Build the tries with the filtered words
+               TrieST trie = tb.buildTrie(filteredWord2vecNeighbours);
+               TrieOperations.serializeToFile(trie, INPUT_WORD, OUTPUT_DIR);
+
+               TrieST backwardTrie = tb.buildTrie(reverseWord2vecNeighbours);
+               TrieOperations.serializeToFile(backwardTrie, INPUT_WORD, OUTPUT_DIR_BACK);
+           }
+       }
         //Use tries by deserializing them (below it prints the words which start with the INPUT_WORD)
         System.out.println("========= Trie is built =========");
-	   ArrayList<TrieST> tries = TrieOperations.deSerialize(OUTPUT_DIR);
+/*	 ArrayList<TrieST> tries = TrieOperations.deSerialize(OUTPUT_DIR);
        for (TrieST t : tries) {
 		   Iterator ite = t.keysWithPrefix("").iterator();
             while (ite.hasNext()) {
@@ -133,5 +147,14 @@ public class FilteredTrieBuilder {
                 System.out.println(next);
             }
         }
+
+		ArrayList<TrieST> backWardTries = TrieOperations.deSerialize(OUTPUT_DIR_BACK);
+		for (TrieST t : backWardTries) {
+			Iterator ite = t.keysWithPrefix("").iterator();
+			while (ite.hasNext()) {
+				String next = (String) ite.next();
+				System.out.println(next);
+			}
+		}*/
     }
 }
